@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Anamnesebogen</title>
+    <link rel="stylesheet" href="/Style.css" />
+    <script>
+      window.addEventListener("DOMContentLoaded", () => {
+        const now = new Date().toISOString(); // or toLocaleString()
+        document.getElementById("entryTime").value = now;
+      });
+    </script>
+  </head>
+  <body>
+    <% if (message) { %>
+    <script>
+      alert("<%= message %>");
+    </script>
+    <% } %>
+    <!-- Language Toggle -->
+    <div id="language-toggle" onclick="toggleLanguage()">🌐</div>
+    <div class="header">
+      <h1 data-i18n="title">Anamnesformular</h1>
+      <div data-i18n="subtitle">allgemein</div>
+    </div>
+    <div class="container">
+      <div class="section-title" data-i18n="sectionTitle">
+        Stammdaten & Einverständnis
+      </div>
+      <div class="intro" data-i18n="intro">
+        Liebe Patientinnen, liebe Patienten,<br />
+        um Sie optimal betreuen zu können, bitten wir Sie diesen Fragebogen
+        auszufüllen.
+      </div>
+
+      <form method="post" action="/send">
+        <div class="form-group">
+          <label for="nachname" data-i18n="lastNameLabel"
+            >Nachname <span class="required" aria-hidden="true">*</span></label
+          >
+          <input type="text" id="nachname" name="nachname" required />
+        </div>
+        <div class="form-group">
+          <label for="vorname" data-i18n="firstNameLabel"
+            >Vorname <span class="required" aria-hidden="true">*</span></label
+          >
+          <input type="text" id="vorname" name="vorname" required />
+        </div>
+        <div class="form-group">
+          <label for="geburtsdatum" data-i18n="birthDateLabel"
+            >Geburtsdatum
+            <span class="required" aria-hidden="true">*</span></label
+          >
+          <input type="date" id="geburtsdatum" name="geburtsdatum" required />
+        </div>
+        <div class="form-group">
+          <label for="versicherungsnummer" data-i18n="insuranceNumberLabel"
+            >Versicherungsnummer
+            <span class="required" aria-hidden="true">*</span></label
+          >
+          <input
+            type="text"
+            id="versicherungsnummer"
+            name="versicherungsnummer"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="geschlecht" data-i18n="genderLabel"
+            >Geschlecht
+            <span class="required" aria-hidden="true">*</span></label
+          >
+          <select id="geschlecht" name="geschlecht" required>
+            <option value="" data-i18n="genderChoose">Bitte wählen</option>
+            <option value="M" data-i18n="genderMale">männlich</option>
+            <option value="W" data-i18n="genderFemale">weiblich</option>
+            <option value="divers" data-i18n="genderDiverse">divers</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="strasse" data-i18n="streetLabel"
+            >Straße & Hausnummer
+            <span class="required" aria-hidden="true">*</span></label
+          >
+          <input type="text" id="strasse" name="strasse" required />
+        </div>
+        <div class="form-group">
+          <label for="plz" data-i18n="zipLabel"
+            >Postleitzahl
+            <span class="required" aria-hidden="true">*</span></label
+          >
+          <input type="text" id="plz" name="plz" required />
+        </div>
+        <div class="form-group full-width">
+          <label for="medication" data-i18n="medicationLabel"
+            >Medication request
+            <span class="required" aria-hidden="true">*</span></label
+          >
+          <textarea
+            id="medication"
+            name="medication"
+            maxlength="150"
+            required
+            data-i18n="medicationPlaceholder"
+          ></textarea>
+        </div>
+        <div class="form-group full-width">
+          <label for="note" data-i18n="noteLabel"
+            >Note to doctor
+            <span style="color: #888" data-i18n="optional"
+              >(Optional)</span
+            ></label
+          >
+          <textarea
+            id="note"
+            name="note"
+            maxlength="150"
+            data-i18n="notePlaceholder"
+          ></textarea>
+          <input type="hidden" name="entryTime" id="entryTime" />
+        </div>
+        <button type="submit" data-i18n="submitButton">Senden</button>
+      </form>
+    </div>
+    <!-- <script src="Script.js"></script> -->
+  </body>
+</html>
