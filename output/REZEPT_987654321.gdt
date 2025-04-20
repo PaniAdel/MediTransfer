@@ -1,0 +1,15 @@
+0100 841
+    0101 MEDIKAMENTENSYSTEM_X
+    0102 20250420          
+    0103 013947         
+    0104 20250420    
+    0105 014342     
+    0201 987654321
+    0202 Müller
+    0203 Erika
+    0204 19801212
+    0205 W
+    3000 Prescription Request
+    4000 Medication: Ramipril 5 mg 1-0-0
+    4001 Note: GP may adjust dosage
+    8000 END
