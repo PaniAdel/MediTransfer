@@ -4,6 +4,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import bodyParser from "body-parser";
 import fs from "fs";
+// import iconv from "iconv-lite";
 import gdtLine from "./utils/gdtUtils.js";
 
 const app = express();
@@ -65,21 +66,17 @@ app.post("/send", (req, res) => {
     gdtLine("8000", "END"),
   ].join("\n");
 
-    // Save it as a .gdt file
-    const filename = `REZEPT_${versicherungsnummer}.gdt`;
-    const filepath = path.join(__dirname, "output", filename);
-    fs.writeFileSync(filepath, gdtContent, { encoding: "latin1" });
+  // Save it as a .gdt file
+  const filename = `REZEPT_${versicherungsnummer}.gdt`;
+  const filepath = path.join(__dirname, "output", filename);
+  fs.writeFileSync(filepath, gdtContent, { encoding: "latin1" });
 
-    const message = `Vielen Dank! ${nachname}, Ihr Rezeptwunsch wurde übermittelt.`;
+  const message = `Vielen Dank! ${nachname}, Ihr Rezeptwunsch wurde übermittelt.`;
 
-  res.send(`
-    <h2>Ihre GDT-Datei wurde erstellt</h2>
-    <pre>${gdtContent}</pre>
-    <a href="/">Zurück zur Startseite</a>
-  `);
+
+  res.render("index", { message });
 });
 
 app.listen(PORT, () => {
   console.log(`Server is listening on port: ${PORT}`);
-  //   console.log("Server is listening on  port " + PORT);
 });
