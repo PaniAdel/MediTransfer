@@ -4,6 +4,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import bodyParser from "body-parser";
 import fs from "fs";
+import gdtLine from "./utils/gdtUtils.js";
 
 const app = express();
 const PORT = 3000;
@@ -46,33 +47,36 @@ app.post("/send", (req, res) => {
   } = req.body;
 
   const submissionTime = new Date().toISOString(); // Current time
+  const gdtContent = [
+    gdtLine("0100", "841"),
+    gdtLine("0101", "MEDIKAMENTENSYSTEM_X"),
+    gdtLine("0102", formatDate(entryTime)),
+    gdtLine("0103", formatTime(entryTime)),
+    gdtLine("0104", formatDate(submissionTime)),
+    gdtLine("0105", formatTime(submissionTime)),
+    gdtLine("0201", versicherungsnummer),
+    gdtLine("0202", nachname),
+    gdtLine("0203", vorname),
+    gdtLine("0204", geburtsdatum.replace(/-/g, "")),
+    gdtLine("0205", geschlecht),
+    gdtLine("3000", "Prescription Request"),
+    gdtLine("4000", `Medication: ${medication}`),
+    gdtLine("4001", `Note: ${note || ""}`),
+    gdtLine("8000", "END"),
+  ].join("\n");
 
-  const gdtContent = `
-    0100 841
-    0101 MEDIKAMENTENSYSTEM_X
-    0102 ${formatDate(entryTime)}          
-    0103 ${formatTime(entryTime)}         
-    0104 ${formatDate(submissionTime)}    
-    0105 ${formatTime(submissionTime)}     
-    0201 ${versicherungsnummer}
-    0202 ${nachname}
-    0203 ${vorname}
-    0204 ${geburtsdatum.replace(/-/g, "")}
-    0205 ${geschlecht}
-    3000 Prescription Request
-    4000 Medication: ${medication}
-    4001 Note: ${note}
-    8000 END
-`.trim();
+    // Save it as a .gdt file
+    const filename = `REZEPT_${versicherungsnummer}.gdt`;
+    const filepath = path.join(__dirname, "output", filename);
+    fs.writeFileSync(filepath, gdtContent, { encoding: "latin1" });
 
-  const message = `Vielen Dank! ${nachname}, Ihr Rezeptwunsch wurde übermittelt.`;
+    const message = `Vielen Dank! ${nachname}, Ihr Rezeptwunsch wurde übermittelt.`;
 
-  // Save it as a .gdt file
-  const filename = `REZEPT_${versicherungsnummer}.gdt`;
-  const filepath = path.join(__dirname, "output", filename);
-  fs.writeFileSync(filepath, gdtContent, "utf-8");
-
-  res.render("index", { message });
+  res.send(`
+    <h2>Ihre GDT-Datei wurde erstellt</h2>
+    <pre>${gdtContent}</pre>
+    <a href="/">Zurück zur Startseite</a>
+  `);
 });
 
 app.listen(PORT, () => {
