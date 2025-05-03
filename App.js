@@ -1,28 +1,24 @@
-import express from "express";
-import morgan from "morgan";
-import path from "path";
-import { fileURLToPath } from "url";
-import bodyParser from "body-parser";
-import fs from "fs";
-// import iconv from "iconv-lite";
-import gdtLine from "./utils/gdtUtils.js";
+// app.js (CommonJS)
+const express = require("express");
+const morgan = require("morgan");
+const path = require("path");
+const bodyParser = require("body-parser");
+const fs = require("fs");
+const os = require("os");
+const gdtLine = require("./utils/gdtUtils");
 
 const app = express();
 const PORT = 3000;
+
 app.set("view engine", "ejs");
 
-// Utility functions to format timestamps
+// Utility functions
 function formatDate(isoString) {
-  return isoString.slice(0, 10).replace(/-/g, ""); // e.g., 2025-04-19 -> 20250419
+  return isoString.slice(0, 10).replace(/-/g, "");
 }
-
 function formatTime(isoString) {
-  return isoString.slice(11, 19).replace(/:/g, "").slice(0, 6); // e.g., 14:22:10 -> 142210
+  return isoString.slice(11, 19).replace(/:/g, "").slice(0, 6);
 }
-
-// __dirname Setup
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 app.use(morgan("dev"));
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -47,7 +43,8 @@ app.post("/send", (req, res) => {
     entryTime,
   } = req.body;
 
-  const submissionTime = new Date().toISOString(); // Current time
+  const submissionTime = new Date().toISOString();
+
   const gdtContent = [
     gdtLine("0100", "841"),
     gdtLine("0101", "MEDIKAMENTENSYSTEM_X"),
@@ -66,17 +63,31 @@ app.post("/send", (req, res) => {
     gdtLine("8000", "END"),
   ].join("\n");
 
-  // Save it as a .gdt file
   const filename = `REZEPT_${versicherungsnummer}.gdt`;
-  const filepath = path.join(__dirname, "output", filename);
-  fs.writeFileSync(filepath, gdtContent, { encoding: "latin1" });
+
+  const folderPath =
+    process.platform === "darwin"
+      ? "/Users/Shared/tomedo/gdt-import"
+      : path.join(os.homedir(), "tomedo", "gdt-import");
+
+  const filePath = path.join(folderPath, filename);
+
+  if (!fs.existsSync(folderPath)) {
+    fs.mkdirSync(folderPath, { recursive: true });
+  }
+
+  fs.writeFileSync(filePath, gdtContent, { encoding: "latin1" });
 
   const message = `Vielen Dank! ${nachname}, Ihr Rezeptwunsch wurde übermittelt.`;
-
 
   res.render("index", { message });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is listening on port: ${PORT}`);
-});
+// Only listen if not in test mode
+if (process.env.NODE_ENV !== "test") {
+  app.listen(PORT, () => {
+    console.log(`Server is listening on port: ${PORT}`);
+  });
+}
+
+module.exports = app;
